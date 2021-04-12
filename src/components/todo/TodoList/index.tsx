@@ -1,24 +1,27 @@
-import { ITodoListState } from "@/src/libs/intefaces/todoList";
-import { FC, ReactElement, useMemo } from "react";
+import { todoListSelector } from "@/src/modules/selector/todoList";
+import { FC, ReactElement, useEffect, useState } from "react";
+import { useRecoilValueLoadable } from "recoil";
 import { TodoItem } from "../TodoItem";
 import * as S from "./style"
-interface Props {
-    todo : ITodoListState[]
-}
-export const TodoList : FC<Props> = ({ todo }) : ReactElement => {
-    const todoList = useMemo(
-        ()=>todo.map((i)=>(
-            <TodoItem 
+interface Props {}
+export const TodoList : FC<Props> = () : ReactElement => {
+    const todo = useRecoilValueLoadable(todoListSelector);
+    const [isOpen, setOpen] = useState(false);
+    useEffect(()=>{
+        setOpen(true);
+    },[])
+    if(!isOpen || todo.state==="loading") return(<div>loading...</div>) 
+    return(
+        <S.TodoListWrapper>
+        {
+            todo.contents.map(i=>(
+                <TodoItem 
                 key={i.id} 
                 id={i.id}
-                content={i.content}
-            />
-        )),
-        [todo]
-    )
-    return(
-        <S.Wrapper>
-            {todoList}
-        </S.Wrapper>
+                regist_Date={i.regist_Date}
+                content={i.content}/>)
+            )
+        }
+        </S.TodoListWrapper>
     )
 }
